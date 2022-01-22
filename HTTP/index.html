@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Simple Java WebServer</title>
+</head>
+<body>
+	<h1>Simple Java WebServer</h1>
+	<p>serve static html</p>
+	<p>accept GET and POST method</p>
+	<a href="anotherPage.html">test link to anotherPage.html</a>
+	<div style="margin:4px;padding:8px;border:1px solid black; border-radius:5px;">
+		<p>test GET method with custom path and queryStrings</p>
+		<ul>
+			<li><a href="page2.html">page2.html</a></li>
+			<li><a href="page?key1=value1&key2=value2"><code>page?key1=value1&key2=value2</code></a></li>
+		</ul>
+		<div>
+			<label for="path">Type your custom path and or queryStrings</label><br>
+			<input type="text" id="get" value="page?key1=value1&key2=value2"><br>
+			<button onclick="send()">GET</button>
+			<p>result: </p>
+			<textarea id="resultGet" cols="70" rows="7"></textarea> 
+		</div>
+	</div>
+	
+	<div style="margin:4px;padding:8px;border:1px solid black; border-radius:5px;">
+		<p>test POST method</p>
+		<p>currently can process "Content-Type: application/json" only</p>
+		<div>
+			<textarea id="post" cols="70" rows="7"></textarea><br>
+			<button onclick="post()">POST</button>
+			<p>result: </p>
+			<textarea id="resultPost" cols="70" rows="7"></textarea> 
+		</div>
+	</div>
+
+<script>
+var readyState = ['UNSENT', 'OPENED', 'HEADERS_RECEIVED', 'LOADING', 'DONE'];
+
+function send() {
+	var a = new XMLHttpRequest();
+	a.open('GET', document.getElementById('get').value);
+	a.onreadystatechange = () => {
+		var b = document.getElementById('resultGet');
+		b.value += `readyState: ${readyState[a.readyState]}, status: ${a.status} \r\n`;
+		if (a.readyState) {
+			if (a.status === 0 || (a.status >= 200 && a.status < 400))
+			b.value += a.responseText + '\r\n';
+		}
+	}
+	a.send();
+}
+
+document.getElementById('post').value = `{ "email": "hello@user.com", "response": { "name": "Tester" } }`;
+
+function post() {
+	var a = new XMLHttpRequest();
+	a.open('POST', '/');
+	a.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	a.onreadystatechange = () => {
+		var b = document.getElementById('resultPost');
+		b.value += `readyState: ${readyState[a.readyState]}, status: ${a.status} \r\n`;
+		if (a.readyState) {
+			if (a.status === 0 || (a.status >= 200 && a.status < 400))
+			b.value += a.responseText + '\r\n';
+		}
+	}
+	a.send(document.getElementById('post').value);
+}
+
+</script>
+</body>
+</html>
