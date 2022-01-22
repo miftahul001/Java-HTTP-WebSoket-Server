@@ -22,7 +22,7 @@ public class WebServer {
 	public static void main(String[] args) {
 		try {
 			ServerSocket server = new ServerSocket(8080);
-			displayAllIP4Address(server);
+			displayAllIP4Address();
 			
 			server.setSoTimeout(2000);
 			while (true) {
