@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>WebSocket Client</title>
+</head>
+<body>
+
+<h2>WebSocket Test</h2>
+
+<div>
+	<label for="server">Server :&nbsp;</label>
+	<input type="text" id="server" value="ws://localhost:8080/chat" />
+	<br>
+	<button id="connectBtn" onclick="connect()">Connect</button>&nbsp;&nbsp;
+	<button id="disconnect" onclick="disconnect()" disabled>Disconnect</button>
+</div>
+
+<div>
+	<label for="msg">Message :&nbsp;</label>
+	<textarea  id="msg" rows="5" cols="35">Test a message</textarea>
+	<br>
+	<button id="sendBtn" onclick="send()" disabled>Send</button>
+</div>
+
+<div id="output" style="margin:4px;padding:4px;border:1px solid black;">
+	<h2>Output</h2>
+</div>
+
+<script type="text/javascript">
+var webSocket,
+hostserver = document.getElementById("server"),
+connectBtn = document.getElementById("connectBtn"),
+disconnectBtn = document.getElementById("disconnect"),
+msg = document.getElementById("msg"),
+sendBtn = document.getElementById("sendBtn"),
+output = document.getElementById("output");
+//    var wsUrl = (location.protocol == "https:" ? "wss://" : "ws://") + location.hostname + (location.port ? ':'+location.port: '') + "/websocket/toUpper";
+
+function connect() {
+	// open the connection if one does not exist
+	if (webSocket !== undefined && webSocket.readyState !== WebSocket.CLOSED) {
+		return;
+	}
+	updateOutput("Trying to establish a WebSocket connection to <code>" + hostserver.value + "</code>");
+	
+	// Create a websocket
+	webSocket = new WebSocket(hostserver.value);
+	
+	webSocket.onopen = event => {
+		updateOutput("Connected!");
+		hostserver.disabled = true;
+		connectBtn.disabled = true;
+		disconnectBtn.disabled = false;
+		sendBtn.disabled = false;
+	};
+	
+	webSocket.onmessage = event => updateOutput(event.data);
+	webSocket.onerror = event => console.log(event);
+	
+	webSocket.onclose = event => {
+		updateOutput("Connection Closed");
+		hostserver.disabled = false;
+		connectBtn.disabled = false;
+		disconnectBtn.disabled = true;
+		sendBtn.disabled = true;
+	};
+}
+
+send = () => webSocket.send(msg.value);
+updateOutput = text => output.innerHTML += "<br/>" + text;
+disconnect = () => webSocket.close();
+
+</script>
+
+</body>
+</html>
